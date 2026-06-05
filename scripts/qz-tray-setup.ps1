@@ -4,13 +4,25 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-Write-Host "QZ Tray Setup - Windows" -ForegroundColor Cyan
-
+# Check if running as administrator
 $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
+
+# If not admin, restart with elevation
 if (-not $isAdmin) {
-    Write-Host "Error: Run as Administrator" -ForegroundColor Red
-    exit 1
+    Write-Host "Requesting administrator privileges..." -ForegroundColor Yellow
+    $scriptPath = $MyInvocation.MyCommand.Path
+    $args = $MyInvocation.UnboundArguments
+
+    if ($scriptPath) {
+        Start-Process powershell.exe -Verb RunAs -ArgumentList @("-File", $scriptPath) + $args
+    } else {
+        Write-Host "Error: Unable to elevate privileges" -ForegroundColor Red
+        exit 1
+    }
+    exit 0
 }
+
+Write-Host "QZ Tray Setup - Windows" -ForegroundColor Cyan
 
 $qzTrayPath = "C:\Program Files\QZ Tray\qz-tray.exe"
 if (-not (Test-Path $qzTrayPath)) {
