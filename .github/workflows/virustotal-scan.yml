@@ -26,62 +26,32 @@ jobs:
 
           ls -lh ./to-scan/ || echo "No files downloaded"
 
-      - name: Upload to VirusTotal
-        env:
-          VIRUSTOTAL_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
+      - name: Calculate file hashes for VirusTotal
         run: |
-          if [ -z "$VIRUSTOTAL_API_KEY" ]; then
-            echo "⚠️  VirusTotal API key not configured. Skipping scan."
-            echo "To enable VirusTotal scanning, add VIRUSTOTAL_API_KEY secret to your repository."
-            exit 0
-          fi
-
           cd ./to-scan
-
-          upload_to_vt() {
-            local file=$1
-            if [ ! -f "$file" ]; then
-              echo "File not found: $file"
-              return 1
-            fi
-
-            echo "Uploading $file to VirusTotal..."
-
-            response=$(curl -s -X POST "https://www.virustotal.com/api/v3/files" \
-              -H "x-apikey: $VIRUSTOTAL_API_KEY" \
-              -F "file=@$file")
-
-            analysis_id=$(echo "$response" | grep -o '"id":"[^"]*"' | head -1 | cut -d'"' -f4)
-
-            if [ -z "$analysis_id" ]; then
-              echo "Failed to upload $file"
-              echo "Response: $response"
-              return 1
-            fi
-
-            echo "Uploaded: $file"
-            echo "Analysis ID: $analysis_id"
-            echo "View results: https://www.virustotal.com/gui/file/$analysis_id"
-          }
-
+          echo "## File Hashes for VirusTotal Verification"
+          echo ""
           for file in *; do
             if [ -f "$file" ]; then
-              upload_to_vt "$file"
+              echo "**$file:**"
+              sha256sum "$file" | awk '{print "SHA256: " $1}'
+              echo ""
             fi
-          done
+          done > ../vt-hashes.txt
+          cat ../vt-hashes.txt
 
-      - name: Update release with scan status
+      - name: Update release with hash verification note
         if: success()
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
             const releaseBody = context.payload.release.body || '';
-            const scanNote = "\n\n---\n\n## ✅ Security Scan\n\nAll installers have been scanned with VirusTotal (70+ antivirus engines). No malware detected.\n\nUsers can independently verify installer safety on [VirusTotal](https://www.virustotal.com).";
+            const hashNote = "\n\n---\n\n## 🔒 Security & Verification\n\nInstallers are built from open-source code and can be independently verified:\n\n- **Source:** https://github.com/EzequielGaribotto/prostring-releases\n- **Build:** Node.js binaries bundled with `pkg`\n- **Verification:** Users can calculate file hashes and compare with hashes in the release workflow logs\n\nFor additional security verification, users can upload the files to [VirusTotal](https://www.virustotal.com) using the file hashes below.";
 
             await github.rest.repos.updateRelease({
               owner: context.repo.owner,
               repo: context.repo.repo,
               release_id: context.payload.release.id,
-              body: releaseBody + scanNote
+              body: releaseBody + hashNote
             });
