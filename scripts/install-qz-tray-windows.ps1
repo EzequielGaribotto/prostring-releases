@@ -47,7 +47,8 @@ if ($qzTrayInstalled) {
             Write-Host "✓ QZ Tray installed successfully" -ForegroundColor Green
             Remove-Item $installerPath -Force
         } else {
-            Write-Host "Warning: QZ Tray installation path not found. Installation may have failed." -ForegroundColor Yellow
+            $msg = "Warning: QZ Tray installation path not found. Installation may have failed."
+            Write-Host $msg -ForegroundColor Yellow
         }
     }
     catch {
