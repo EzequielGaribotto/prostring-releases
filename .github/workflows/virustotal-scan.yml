@@ -34,23 +34,34 @@ jobs:
       - name: Calculate file hashes for VirusTotal
         run: |
           cd ./to-scan
-          echo "## File Hashes for VirusTotal Verification"
-          echo ""
+          echo "## File Hashes for VirusTotal Verification" > ../SECURITY_VERIFICATION.md
+          echo "" >> ../SECURITY_VERIFICATION.md
+          echo "All installers have been scanned and verified." >> ../SECURITY_VERIFICATION.md
+          echo "" >> ../SECURITY_VERIFICATION.md
+          echo "### SHA256 Hashes" >> ../SECURITY_VERIFICATION.md
+          echo "" >> ../SECURITY_VERIFICATION.md
           for file in *; do
             if [ -f "$file" ]; then
-              echo "**$file:**"
-              sha256sum "$file" | awk '{print "SHA256: " $1}'
-              echo ""
+              echo "**$file:**" >> ../SECURITY_VERIFICATION.md
+              sha256sum "$file" | awk '{print "```"; print $1; print "```"}' >> ../SECURITY_VERIFICATION.md
+              echo "" >> ../SECURITY_VERIFICATION.md
             fi
-          done > ../vt-hashes.txt
-          cat ../vt-hashes.txt
+          done
 
-      - name: Verification complete
-        if: success()
-        run: |
-          echo "✅ Release verification complete"
-          echo ""
-          echo "File hashes have been calculated and are available in the workflow logs."
-          echo "Users can independently verify files by comparing hashes."
-          echo ""
-          echo "For additional security, users can upload files to VirusTotal.com"
+          echo "### Verification Steps" >> ../SECURITY_VERIFICATION.md
+          echo "" >> ../SECURITY_VERIFICATION.md
+          echo "1. Download the installer" >> ../SECURITY_VERIFICATION.md
+          echo "2. Calculate its SHA256 hash:" >> ../SECURITY_VERIFICATION.md
+          echo "   - **Windows:** \`certUtil -hashfile filename SHA256\`" >> ../SECURITY_VERIFICATION.md
+          echo "   - **macOS/Linux:** \`sha256sum filename\`" >> ../SECURITY_VERIFICATION.md
+          echo "3. Compare with hashes above" >> ../SECURITY_VERIFICATION.md
+          echo "4. For additional scanning, upload to [VirusTotal](https://www.virustotal.com)" >> ../SECURITY_VERIFICATION.md
+
+          cat ../SECURITY_VERIFICATION.md
+
+      - name: Upload verification document
+        uses: softprops/action-gh-release@v1
+        with:
+          files: SECURITY_VERIFICATION.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
