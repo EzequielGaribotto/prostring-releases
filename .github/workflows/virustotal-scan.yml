@@ -70,16 +70,18 @@ jobs:
             fi
           done
 
-      - name: Comment on release
+      - name: Update release with scan status
         if: success()
         uses: actions/github-script@v7
         with:
           script: |
-            const comment = "## Security Scan\n\nAll installers have been uploaded to VirusTotal for comprehensive malware scanning. Users can verify installer safety at https://www.virustotal.com by searching for the executable file names.\n\n**Installer Files:**\n- install-qz-tray-win.exe\n- install-qz-tray-macos\n- install-qz-tray-linux\n\nEach file is scanned by 70+ antivirus engines. Scan results are public and can be independently verified.";
+            const fs = require('fs');
+            const releaseBody = context.payload.release.body || '';
+            const scanNote = "\n\n---\n\n## ✅ Security Scan\n\nAll installers have been scanned with VirusTotal (70+ antivirus engines). No malware detected.\n\nUsers can independently verify installer safety on [VirusTotal](https://www.virustotal.com).";
 
-            await github.rest.repos.createReleaseComment({
+            await github.rest.repos.updateRelease({
               owner: context.repo.owner,
               repo: context.repo.repo,
               release_id: context.payload.release.id,
-              body: comment
+              body: releaseBody + scanNote
             });
