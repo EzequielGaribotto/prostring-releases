@@ -25,3 +25,7 @@ npm-debug.log*
 .idea/
 *.sublime-project
 *.sublime-workspace
+
+#
+*.md
+!README.md

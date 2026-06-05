@@ -4,7 +4,7 @@
 
 set -e
 
-CERTIFICATE_URL="${1:-http://localhost:5173/override.crt}"
+CERTIFICATE_URL="${1:-https://stringjobs.prostringshop.es/qz/override.crt}"
 OS_TYPE=$(uname -s)
 
 echo -e "\n\033[36mQZ Tray Setup - $OS_TYPE\033[0m\n"

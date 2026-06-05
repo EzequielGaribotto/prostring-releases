@@ -2,7 +2,7 @@
 # Installs QZ Tray and sets up override.crt certificate
 
 param(
-    [string]$CertificateUrl = "http://localhost:5173/override.crt"
+    [string]$CertificateUrl = "https://stringjobs.prostringshop.es/qz/override.crt"
 )
 
 $ErrorActionPreference = "Stop"
