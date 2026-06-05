@@ -4,9 +4,9 @@ Public repository for **standalone QZ Tray installers** required by ProString.
 
 ## 📥 Downloads
 
-- **Windows:** [`install-qz-tray-win.exe`](../../releases/v1.0.0/install-qz-tray-win.exe) (37.6 MB)
-- **macOS:** [`install-qz-tray-macos`](../../releases/v1.0.0/install-qz-tray-macos) (51.3 MB)
-- **Linux:** [`install-qz-tray-linux`](../../releases/v1.0.0/install-qz-tray-linux) (46.3 MB)
+- **Windows:** [`install-qz-tray-win.exe`](../../releases/v1.0.0/scripts/dist/install-qz-tray-win.exe) (37.6 MB)
+- **macOS:** [`install-qz-tray-macos`](../../releases/v1.0.0/scripts/dist/install-qz-tray-macos) (51.3 MB)
+- **Linux:** [`install-qz-tray-linux`](../../releases/v1.0.0/scripts/dist/install-qz-tray-linux) (46.3 MB)
 
 Or go to [Releases](../../releases/) to see all versions.
 
