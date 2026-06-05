@@ -4,9 +4,14 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: read
+
 jobs:
   scan:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
@@ -40,18 +45,12 @@ jobs:
           done > ../vt-hashes.txt
           cat ../vt-hashes.txt
 
-      - name: Update release with hash verification note
+      - name: Verification complete
         if: success()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            const releaseBody = context.payload.release.body || '';
-            const hashNote = "\n\n---\n\n## 🔒 Security & Verification\n\nInstallers are built from open-source code and can be independently verified:\n\n- **Source:** https://github.com/EzequielGaribotto/prostring-releases\n- **Build:** Node.js binaries bundled with `pkg`\n- **Verification:** Users can calculate file hashes and compare with hashes in the release workflow logs\n\nFor additional security verification, users can upload the files to [VirusTotal](https://www.virustotal.com) using the file hashes below.";
-
-            await github.rest.repos.updateRelease({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              release_id: context.payload.release.id,
-              body: releaseBody + hashNote
-            });
+        run: |
+          echo "✅ Release verification complete"
+          echo ""
+          echo "File hashes have been calculated and are available in the workflow logs."
+          echo "Users can independently verify files by comparing hashes."
+          echo ""
+          echo "For additional security, users can upload files to VirusTotal.com"
