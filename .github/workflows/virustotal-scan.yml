@@ -31,37 +31,21 @@ jobs:
 
           ls -lh ./to-scan/ || echo "No files downloaded"
 
-      - name: Calculate file hashes for VirusTotal
-        run: |
-          cd ./to-scan
-          echo "## File Hashes for VirusTotal Verification" > ../SECURITY_VERIFICATION.md
-          echo "" >> ../SECURITY_VERIFICATION.md
-          echo "All installers have been scanned and verified." >> ../SECURITY_VERIFICATION.md
-          echo "" >> ../SECURITY_VERIFICATION.md
-          echo "### SHA256 Hashes" >> ../SECURITY_VERIFICATION.md
-          echo "" >> ../SECURITY_VERIFICATION.md
-          for file in *; do
-            if [ -f "$file" ]; then
-              echo "**$file:**" >> ../SECURITY_VERIFICATION.md
-              sha256sum "$file" | awk '{print "```"; print $1; print "```"}' >> ../SECURITY_VERIFICATION.md
-              echo "" >> ../SECURITY_VERIFICATION.md
-            fi
-          done
-
-          echo "### Verification Steps" >> ../SECURITY_VERIFICATION.md
-          echo "" >> ../SECURITY_VERIFICATION.md
-          echo "1. Download the installer" >> ../SECURITY_VERIFICATION.md
-          echo "2. Calculate its SHA256 hash:" >> ../SECURITY_VERIFICATION.md
-          echo "   - **Windows:** \`certUtil -hashfile filename SHA256\`" >> ../SECURITY_VERIFICATION.md
-          echo "   - **macOS/Linux:** \`sha256sum filename\`" >> ../SECURITY_VERIFICATION.md
-          echo "3. Compare with hashes above" >> ../SECURITY_VERIFICATION.md
-          echo "4. For additional scanning, upload to [VirusTotal](https://www.virustotal.com)" >> ../SECURITY_VERIFICATION.md
-
-          cat ../SECURITY_VERIFICATION.md
-
-      - name: Upload verification document
-        uses: softprops/action-gh-release@v1
+      - name: Scan with VirusTotal
+        uses: crazy-max/ghaction-virustotal@v4
         with:
-          files: SECURITY_VERIFICATION.md
+          vt_api_key: ${{ secrets.VIRUSTOTAL_API_KEY }}
+          files: |
+            ./to-scan/install-qz-tray-win.exe
+            ./to-scan/install-qz-tray-macos
+            ./to-scan/install-qz-tray-linux
+
+      - name: Upload scan results
+        uses: softprops/action-gh-release@v1
+        if: always()
+        with:
+          files: |
+            ./results.sarif
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
