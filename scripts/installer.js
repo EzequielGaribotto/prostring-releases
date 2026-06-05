@@ -62,6 +62,9 @@ async function installWindows() {
   } catch (err) {
     throw new Error('PowerShell installation failed')
   }
+
+  console.log('\nPress any key to exit...')
+  execSync('pause', { shell: 'cmd.exe' })
 }
 
 async function installMacOS() {
