@@ -26,6 +26,8 @@ npm-debug.log*
 *.sublime-project
 *.sublime-workspace
 
-#
+# Documentation (keep important docs)
 *.md
 !README.md
+!VIRUSTOTAL_SETUP.md
+!TESTING.md
