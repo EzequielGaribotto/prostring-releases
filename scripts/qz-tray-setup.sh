@@ -71,3 +71,6 @@ echo "Setup Complete!"
 echo "Next steps:"
 echo "1. Grant permission when QZ Tray shows security dialog"
 echo "2. Configure printers in ProString Settings"
+echo ""
+echo "Press any key to exit..."
+read -n 1

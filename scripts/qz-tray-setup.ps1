@@ -66,3 +66,5 @@ Write-Host "`nSetup Complete!" -ForegroundColor Green
 Write-Host "Next steps:" -ForegroundColor Cyan
 Write-Host "1. Grant permission when QZ Tray shows security dialog" -ForegroundColor Gray
 Write-Host "2. Configure printers in ProString Settings" -ForegroundColor Gray
+Write-Host "`nPress any key to exit..." -ForegroundColor Gray
+$null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
